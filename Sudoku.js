@@ -21,13 +21,15 @@ let grid = new SudokuGrid(data);
 let puzzle = new SudokuGrid(data);
 let solver = new Solver(puzzle);
 
+console.log(puzzle.ToString());
+
 //var start = DateTime.Now;
 let solved = solver.Solve();
 //var finish = DateTime.Now;
 
 if (solved) {
 
-    console.log(puzzle);
+    console.log(puzzle.ToString());
 
     //var elapsedTime = finish - start;
     //var elapsed = elapsedTime.Milliseconds;

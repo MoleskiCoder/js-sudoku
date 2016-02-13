@@ -203,7 +203,7 @@ export default class SudokuGrid extends Grid {
         for (let y = 0; y < height; ++y) {
             let width = this.Width;
             for (let x = 0; x < width; ++x) {
-                let number = this.Get(x, y);
+                let number = this.GetViaXY(x, y);
                 output += ' ';
                 if (number == this.UNASSIGNED) {
                     output += '-';

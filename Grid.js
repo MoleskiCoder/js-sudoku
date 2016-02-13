@@ -17,7 +17,7 @@ export default class Grid {
     }
 
     SetViaXY(x, y, value) {
-        this.Set(this.GetOffset(x, y), value);
+        this.Set(this.CalculateOffset(x, y), value);
     }
 
     Set(offset, value) {
@@ -25,14 +25,14 @@ export default class Grid {
     }
 
     GetViaXY(x, y) {
-        return this.Get(this.GetOffset(x, y));
+        return this.Get(this.CalculateOffset(x, y));
     }
 
     Get(offset) {
         return this.values[offset];
     }
 
-    GetOffset(x, y) {
+    CalculateOffset(x, y) {
         return x + y * this.Width;
     }
 }
