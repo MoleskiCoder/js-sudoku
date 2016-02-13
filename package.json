@@ -1,0 +1,9 @@
+{
+  "name": "Sudoku",
+  "version": "0.0.1",
+
+  "devDependencies": {
+    "babel-preset-es2015": "latest",
+    "babel-register": "latest"
+  }
+}
