@@ -18,22 +18,20 @@ export default class SudokuGrid extends Grid {
         this.WIDTH = dimension;
         this.HEIGHT = dimension;
         this.BOX_DIMENSION = 3;
-        this.possibles = [];
 
+        this.possibles = [];
         this.offsets = [];
 
-        let numbers = {};
-        for (let i = 1; i < dimension + 1; ++i) {
-            numbers[i] = true;
+        let numbers = new Set;
+        for (let i = 1; i < this.DIMENSION + 1; ++i) {
+            numbers.add(i);
         }
 
-        let empty = {};
-
-        for (let offset = 0; offset < cellCount; ++offset) {
-            if (this.Get(offset) == unassigned) {
-                this.possibles.push(numbers);
+        for (let offset = 0; offset < this.CELL_COUNT; ++offset) {
+            if (this.Get(offset) == this.UNASSIGNED) {
+                this.possibles.push(new Set(numbers));
             } else {
-                this.possibles.push(empty);
+                this.possibles.push(new Set);
             }
         }
     }
@@ -76,7 +74,7 @@ export default class SudokuGrid extends Grid {
     EliminateRowDangling() {
         for (let y = 0; y < this.HEIGHT; ++y) {
             let offset = y * this.DIMENSION;
-            let counters = [];
+            let counters = new Map;
             for (let x = 0; x < this.WIDTH; ++x) {
                 this.AdjustPossibleCounters(counters, offset++);
             }
@@ -87,7 +85,7 @@ export default class SudokuGrid extends Grid {
     EliminateColumnDangling() {
         for (let x = 0; x < this.WIDTH; ++x) {
             let offset = x;
-            let counters = [];
+            let counters = new Map;
             for (let y = 0; y < this.HEIGHT; ++y) {
                 this.AdjustPossibleCounters(counters, offset);
                 offset += this.DIMENSION;
@@ -99,7 +97,7 @@ export default class SudokuGrid extends Grid {
     EliminateBoxDangling() {
         for (let y = 0; y < this.HEIGHT; y += this.BOX_DIMENSION) {
             for (let x = 0; x < this.WIDTH; x += this.BOX_DIMENSION) {
-                let counters = [];
+            let counters = new Map;
 
                 let boxStartX = x - x % this.BOX_DIMENSION;
                 let boxStartY = y - y % this.BOX_DIMENSION;
@@ -129,10 +127,10 @@ export default class SudokuGrid extends Grid {
 
     AdjustPossibleCounters(counters, offset) {
         for (let possible of this.possibles[offset]) {
-            let counter;
-            if (!possible in counters) {
+            let counter = counters.get(possible);
+            if (counter == undefined) {
                 counter = [];
-                counters[possible] = counter;
+                counters.set(possible, counter);
             }
             counter.push(offset);
         }
@@ -171,7 +169,7 @@ export default class SudokuGrid extends Grid {
         let offset = y * this.DIMENSION;
         for (let x = 0; x < this.WIDTH; ++x) {
             let possible = this.possibles[offset];
-            delete possible[number];
+            possible.delete(number);
             offset++;
         }
     }
@@ -180,7 +178,7 @@ export default class SudokuGrid extends Grid {
         let offset = x;
         for (let y = 0; y < this.HEIGHT; ++y) {
             let possible = this.possibles[offset];
-            delete possible[number];
+            possible.delete(number);
             offset += this.DIMENSION;
         }
     }
@@ -191,7 +189,7 @@ export default class SudokuGrid extends Grid {
             let offset = boxStartX + y * this.DIMENSION;
             for (let xOffset = 0; xOffset < this.BOX_DIMENSION; ++xOffset) {
                 let possible = this.possibles[offset];
-                delete possible[number];
+                possible.delete(number);
                 offset++;
             }
         }
