@@ -8,8 +8,8 @@ export default class Solver {
 
     constructor(start) {
         this.grid = start;
-        this.width = this.grid.Width;
-        this.height = this.grid.Height;
+        this.width = this.grid.width;
+        this.height = this.grid.weight;
     }
 
     solve() {
