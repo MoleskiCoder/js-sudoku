@@ -65,7 +65,7 @@ export default class SudokuGrid extends Grid {
     }
 
     getOffset(index) {
-        if (index + 1 > this.OffsetCount) {
+        if (index + 1 > this._offsetCount) {
             return -1;
         }
         return this._offsets[index];
@@ -102,7 +102,7 @@ export default class SudokuGrid extends Grid {
             for (let x = 0; x < this.WIDTH; ++x) {
                 this._adjustPossibleCounters(counters, offset++);
             }
-           this._transferCountedEliminations(counters);
+            this._transferCountedEliminations(counters);
         }
     }
 
@@ -139,11 +139,11 @@ export default class SudokuGrid extends Grid {
     }
 
     _transferCountedEliminations(counters) {
-        for (let [number, cells] in counters) {
-            let cells = counters[key];
+        for (let [number, cells] of counters) {
             if (cells.length == 1) {
                 let cell = cells[0];
-                this._possibles[cell] = [ number ];
+                this._possibles[cell].clear();
+                this._possibles[cell].add(number);
             }
         }
     }
