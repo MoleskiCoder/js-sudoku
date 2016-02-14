@@ -16,8 +16,6 @@ let data = [
     0, 9, 0, 0, 0, 0, 4, 0, 0
 ];
 
-let grid = new SudokuGrid(data);
-
 let puzzle = new SudokuGrid(data);
 let solver = new Solver(puzzle);
 

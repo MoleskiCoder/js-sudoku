@@ -17,7 +17,7 @@ export default class Grid {
     }
 
     set(first, second, third) {
-        if (third == undefined) {
+        if (third === undefined) {
             this._setViaOffset(first, second);
         } else {
             this._setViaXY(first, second, third);
@@ -25,7 +25,7 @@ export default class Grid {
     }
 
     get(first, second) {
-        if (second == undefined) {
+        if (second === undefined) {
             return this._getViaOffset(first);
         }
         return this._getViaXY(first, second);

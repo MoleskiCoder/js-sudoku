@@ -22,16 +22,16 @@ export default class SudokuGrid extends Grid {
         this._possibles = [];
         this._offsets = [];
 
-        let numbers = new Set;
+        let numbers = new Set();
         for (let i = 1; i < (this.DIMENSION + 1); ++i) {
             numbers.add(i);
         }
 
         for (let offset = 0; offset < this.CELL_COUNT; ++offset) {
-            if (this.get(offset) == this.UNASSIGNED) {
+            if (this.get(offset) === this.UNASSIGNED) {
                 this._possibles.push(new Set(numbers));
             } else {
-                this._possibles.push(new Set);
+                this._possibles.push(new Set());
             }
         }
     }
@@ -98,7 +98,7 @@ export default class SudokuGrid extends Grid {
     _eliminateRowDangling() {
         for (let y = 0; y < this.HEIGHT; ++y) {
             let offset = y * this.DIMENSION;
-            let counters = new Map;
+            let counters = new Map();
             for (let x = 0; x < this.WIDTH; ++x) {
                 this._adjustPossibleCounters(counters, offset++);
             }
@@ -109,7 +109,7 @@ export default class SudokuGrid extends Grid {
     _eliminateColumnDangling() {
         for (let x = 0; x < this.WIDTH; ++x) {
             let offset = x;
-            let counters = new Map;
+            let counters = new Map();
             for (let y = 0; y < this.HEIGHT; ++y) {
                 this._adjustPossibleCounters(counters, offset);
                 offset += this.DIMENSION;
@@ -121,7 +121,7 @@ export default class SudokuGrid extends Grid {
     _eliminateBoxDangling() {
         for (let y = 0; y < this.HEIGHT; y += this.BOX_DIMENSION) {
             for (let x = 0; x < this.WIDTH; x += this.BOX_DIMENSION) {
-            let counters = new Map;
+            let counters = new Map();
 
                 let boxStartX = x - x % this.BOX_DIMENSION;
                 let boxStartY = y - y % this.BOX_DIMENSION;
@@ -140,7 +140,7 @@ export default class SudokuGrid extends Grid {
 
     _transferCountedEliminations(counters) {
         for (let [number, cells] of counters) {
-            if (cells.length == 1) {
+            if (cells.length === 1) {
                 let cell = cells[0];
                 this._possibles[cell].clear();
                 this._possibles[cell].add(number);
@@ -151,7 +151,7 @@ export default class SudokuGrid extends Grid {
     _adjustPossibleCounters(counters, offset) {
         for (let possible of this._possibles[offset]) {
             let counter = counters.get(possible);
-            if (counter == undefined) {
+            if (counter === undefined) {
                 counter = [];
                 counters.set(possible, counter);
             }
@@ -163,7 +163,7 @@ export default class SudokuGrid extends Grid {
         for (let y = 0; y < this.HEIGHT; ++y) {
             for (let x = 0; x < this.WIDTH; ++x) {
                 let number = this.get(x, y);
-                if (number != this.UNASSIGNED) {
+                if (number !== this.UNASSIGNED) {
                     this._clearRowPossibles(y, number);
                     this._clearColumnPossibles(x, number);
                     this._clearBoxPossibilities(x - x % this.BOX_DIMENSION, y - y % this.BOX_DIMENSION, number);
@@ -177,7 +177,7 @@ export default class SudokuGrid extends Grid {
         for (let offset = 0; offset < this.CELL_COUNT; ++offset) {
             let possible = this._possibles[offset];
             let keys = Object.keys(possible);
-            if (keys.length == 1) {
+            if (keys.length === 1) {
                 let first = keys[0];
                 let singular = possible[first];
                 this.set(offset, singular);
@@ -223,17 +223,17 @@ export default class SudokuGrid extends Grid {
             for (let x = 0; x < width; ++x) {
                 let number = this.get(x, y);
                 output += ' ';
-                if (number == this.UNASSIGNED) {
+                if (number === this.UNASSIGNED) {
                     output += '-';
                 } else {
                     output += number;
                 }
                 output += ' ';
-                if ((x + 1) % this.BOX_DIMENSION == 0 && x + 1 < width) {
+                if ((x + 1) % this.BOX_DIMENSION === 0 && x + 1 < width) {
                     output += '|';
                 }
             }
-            if ((y + 1) % this.BOX_DIMENSION == 0 && y + 1 < width) {
+            if ((y + 1) % this.BOX_DIMENSION === 0 && y + 1 < width) {
                 output += "\n --------+---------+--------";
             }
             output += '\n';

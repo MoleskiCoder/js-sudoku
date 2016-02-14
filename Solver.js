@@ -9,7 +9,7 @@ export default class Solver {
     constructor(start) {
         this.grid = start;
         this.width = this.grid.width;
-        this.height = this.grid.weight;
+        this.height = this.grid.height;
     }
 
     solve() {
@@ -35,7 +35,7 @@ export default class Solver {
 
         let offset = this.grid.getOffset(index);
 
-        if (offset == -1) {
+        if (offset === -1) {
             return true; // success!
         }
 
@@ -77,7 +77,7 @@ export default class Solver {
     _isUsedInRow(y, number) {
         let offset = y * this.grid.DIMENSION;
         for (let x = 0; x < this.width; ++x) {
-            if (this.grid.get(offset++) == number) {
+            if (this.grid.get(offset++) === number) {
                 return true;
             }
         }
@@ -93,7 +93,7 @@ export default class Solver {
     _isUsedInColumn(x, number) {
         let offset = x;
         for (let y = 0; y < this.height; ++y) {
-            if (this.grid.get(offset) == number) {
+            if (this.grid.get(offset) === number) {
                 return true;
             }
             offset += this.grid.DIMENSION;
@@ -112,7 +112,7 @@ export default class Solver {
             let y = yOffset + boxStartY;
             let offset = boxStartX + y * this.grid.DIMENSION;
             for (let xOffset = 0; xOffset < this.grid.BOX_DIMENSION; ++xOffset) {
-                if (this.grid.get(offset++) == number) {
+                if (this.grid.get(offset++) === number) {
                     return true;
                 }
             }
