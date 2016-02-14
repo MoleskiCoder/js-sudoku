@@ -12,15 +12,15 @@ export default class SudokuGrid extends Grid {
 
         super(dimension, dimension, initial);
 
-        this.UNASSIGNED = unassigned;
-        this.DIMENSION = dimension;
-        this.CELL_COUNT = cellCount;
-        this.WIDTH = dimension;
-        this.HEIGHT = dimension;
-        this.BOX_DIMENSION = 3;
+        this._UNASSIGNED = unassigned;
+        this._DIMENSION = dimension;
+        this._CELL_COUNT = cellCount;
+        this._WIDTH = dimension;
+        this._HEIGHT = dimension;
+        this._BOX_DIMENSION = 3;
 
-        this.possibles = [];
-        this.offsets = [];
+        this._possibles = [];
+        this._offsets = [];
 
         let numbers = new Set;
         for (let i = 1; i < this.DIMENSION + 1; ++i) {
@@ -28,73 +28,97 @@ export default class SudokuGrid extends Grid {
         }
 
         for (let offset = 0; offset < this.CELL_COUNT; ++offset) {
-            if (this.Get(offset) == this.UNASSIGNED) {
-                this.possibles.push(new Set(numbers));
+            if (this.get(offset) == this.UNASSIGNED) {
+                this._possibles.push(new Set(numbers));
             } else {
-                this.possibles.push(new Set);
+                this._possibles.push(new Set);
             }
         }
     }
 
-    GetPossibilities(offset) {
-        return this.possibles[offset];
+    get UNASSIGNED() {
+        return this._UNASSIGNED;
     }
 
-    GetOffset(index) {
-        if (index + 1 > this.GetOffsetCount()) {
+    get DIMENSION() {
+        return this._DIMENSION;
+    }
+
+    get CELL_COUNT() {
+        return this._CELL_COUNT;
+    }
+
+    get WIDTH() {
+        return this._WIDTH;
+    }
+
+    get HEIGHT() {
+        return this._HEIGHT;
+    }
+
+    get BOX_DIMENSION() {
+        return this._BOX_DIMENSION;
+    }
+
+    getPossibilities(offset) {
+        return this._possibles[offset];
+    }
+
+    getOffset(index) {
+        if (index + 1 > this.OffsetCount) {
             return -1;
         }
-        return this.offsets[index];
+        return this._offsets[index];
     }
 
-    GetOffsetCount() {
-        return this.offsets.length;
+    get _offsetCount() {
+        return this._offsets.length;
     }
 
-    Eliminate() {
+    _eliminate() {
         do {
-            this.EliminateAssigned();
-            this.EliminateDangling();
-        } while (this.TransferSingularPossibilities());
+            this._eliminateAssigned();
+            this._eliminateDangling();
+        } while (this._transferSingularPossibilities());
 
         for (let i = 0; i < this.CELL_COUNT; ++i) {
-            let possible = this.possibles[i];
+            let possible = this._possibles[i];
             if (possible.length > 1) {
-                this.offsets.push(i);
+                this._offsets.push(i);
             }
         }
     }
 
-    EliminateDangling() {
-        this.EliminateRowDangling();
-        this.EliminateColumnDangling();
-        this.EliminateBoxDangling();
+    _eliminateDangling() {
+        this._eliminateRowDangling();
+        this._eliminateColumnDangling();
+        this._eliminateBoxDangling();
     }
 
-    EliminateRowDangling() {
+    _eliminateRowDangling() {
         for (let y = 0; y < this.HEIGHT; ++y) {
             let offset = y * this.DIMENSION;
             let counters = new Map;
             for (let x = 0; x < this.WIDTH; ++x) {
-                this.AdjustPossibleCounters(counters, offset++);
+                this._adjustPossibleCounters(counters, offset++);
             }
-            this.TransferCountedEliminations(counters);
+            this._transferCountedEliminations(counters);
         }
     }
 
-    EliminateColumnDangling() {
+    _eliminateColumnDangling() {
         for (let x = 0; x < this.WIDTH; ++x) {
             let offset = x;
             let counters = new Map;
             for (let y = 0; y < this.HEIGHT; ++y) {
-                this.AdjustPossibleCounters(counters, offset);
+                this._adjustPossibleCounters(counters, offset);
                 offset += this.DIMENSION;
             }
-            this.TransferCountedEliminations(counters);
+            this._transferCountedEliminations(counters);
         }
     }
 
-    EliminateBoxDangling() {
+    _eliminateBoxDangling() {
         for (let y = 0; y < this.HEIGHT; y += this.BOX_DIMENSION) {
             for (let x = 0; x < this.WIDTH; x += this.BOX_DIMENSION) {
             let counters = new Map;
@@ -106,27 +130,27 @@ export default class SudokuGrid extends Grid {
                     let boxY = yOffset + boxStartY;
                     let offset = boxStartX + boxY * this.DIMENSION;
                     for (let xOffset = 0; xOffset < this.BOX_DIMENSION; ++xOffset) {
-                        this.AdjustPossibleCounters(counters, offset++);
+                        this._adjustPossibleCounters(counters, offset++);
                     }
                 }
-                this.TransferCountedEliminations(counters);
+                this._transferCountedEliminations(counters);
             }
         }
     }
 
-    TransferCountedEliminations(counters) {
+    _transferCountedEliminations(counters) {
         let numbers = Object.keys(counters);
         for (let number in numbers) {
             let cells = counters[key];
             if (cells.length == 1) {
                 let cell = cells[0];
-                this.possibles[cell] = [ number ];
+                this._possibles[cell] = [ number ];
             }
         }
     }
 
-    AdjustPossibleCounters(counters, offset) {
-        for (let possible of this.possibles[offset]) {
+    _adjustPossibleCounters(counters, offset) {
+        for (let possible of this._possibles[offset]) {
             let counter = counters.get(possible);
             if (counter == undefined) {
                 counter = [];
@@ -136,28 +160,28 @@ export default class SudokuGrid extends Grid {
         }
     }
 
-    EliminateAssigned() {
+    _eliminateAssigned() {
         for (let y = 0; y < this.HEIGHT; ++y) {
             for (let x = 0; x < this.WIDTH; ++x) {
-                let number = this.Get(x, y);
+                let number = this.get(x, y);
                 if (number != this.UNASSIGNED) {
-                    this.ClearRowPossibles(y, number);
-                    this.ClearColumnPossibles(x, number);
-                    this.ClearBoxPossibilities(x - x % this.BOX_DIMENSION, y - y % this.BOX_DIMENSION, number);
+                    this._clearRowPossibles(y, number);
+                    this._clearColumnPossibles(x, number);
+                    this._clearBoxPossibilities(x - x % this.BOX_DIMENSION, y - y % this.BOX_DIMENSION, number);
                 }
             }
         }
     }
 
-    TransferSingularPossibilities() {
+    _transferSingularPossibilities() {
         let transfer = false;
         for (let offset = 0; offset < this.CELL_COUNT; ++offset) {
-            let possible = this.possibles[offset];
+            let possible = this._possibles[offset];
             let keys = Object.keys(possible);
             if (keys.length == 1) {
                 let first = keys[0];
                 let singular = possible[first];
-                this.Set(offset, singular);
+                this.set(offset, singular);
                 delete possible[first];
                 transfer = true;
             }
@@ -165,43 +189,43 @@ export default class SudokuGrid extends Grid {
         return transfer;
     }
 
-    ClearRowPossibles(y, number) {
+    _clearRowPossibles(y, number) {
         let offset = y * this.DIMENSION;
         for (let x = 0; x < this.WIDTH; ++x) {
-            let possible = this.possibles[offset];
+            let possible = this._possibles[offset];
             possible.delete(number);
             offset++;
         }
     }
 
-    ClearColumnPossibles(x, number) {
+    _clearColumnPossibles(x, number) {
         let offset = x;
         for (let y = 0; y < this.HEIGHT; ++y) {
-            let possible = this.possibles[offset];
+            let possible = this._possibles[offset];
             possible.delete(number);
             offset += this.DIMENSION;
         }
     }
 
-    ClearBoxPossibilities(boxStartX, boxStartY, number) {
+    _clearBoxPossibilities(boxStartX, boxStartY, number) {
         for (let yOffset = 0; yOffset < this.BOX_DIMENSION; ++yOffset) {
             let y = yOffset + boxStartY;
             let offset = boxStartX + y * this.DIMENSION;
             for (let xOffset = 0; xOffset < this.BOX_DIMENSION; ++xOffset) {
-                let possible = this.possibles[offset];
+                let possible = this._possibles[offset];
                 possible.delete(number);
                 offset++;
             }
         }
     }
 
-    ToString() {
+    toString() {
         let output = '\n';
-        let height = this.Height;
+        let height = this.height;
         for (let y = 0; y < height; ++y) {
-            let width = this.Width;
+            let width = this.width;
             for (let x = 0; x < width; ++x) {
-                let number = this.GetViaXY(x, y);
+                let number = this.get(x, y);
                 output += ' ';
                 if (number == this.UNASSIGNED) {
                     output += '-';

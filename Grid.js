@@ -3,36 +3,51 @@
 export default class Grid {
 
     constructor(gridWidth, gridHeight, initial) {
-        this.height = gridHeight;
-        this.width = gridWidth;
-        this.values = initial;
+        this._height = gridHeight;
+        this._width = gridWidth;
+        this._values = initial;
     }
 
-    get Width() {
-        return this.width;
+    get width() {
+        return this._width;
     }
 
-    get Height() {
-        return this.height;
+    get height() {
+        return this._height;
     }
 
-    SetViaXY(x, y, value) {
-        this.Set(this.CalculateOffset(x, y), value);
+    set(first, second, third) {
+        if (third == undefined) {
+            this._setViaOffset(first, second);
+        } else {
+            this._setViaXY(first, second, third);
+        }
     }
 
-    Set(offset, value) {
-        this.values[offset] = value;
+    get(first, second) {
+        if (second == undefined) {
+            return this._getViaOffset(first);
+        }
+        return this._getViaXY(first, second);
     }
 
-    GetViaXY(x, y) {
-        return this.Get(this.CalculateOffset(x, y));
+    _setViaXY(x, y, value) {
+        this._setViaOffset(this._calculateOffset(x, y), value);
     }
 
-    Get(offset) {
-        return this.values[offset];
+    _setViaOffset(offset, value) {
+        this._values[offset] = value;
     }
 
-    CalculateOffset(x, y) {
-        return x + y * this.Width;
+    _getViaXY(x, y) {
+        return this._getViaOffset(this._calculateOffset(x, y));
+    }
+
+    _getViaOffset(offset) {
+        return this._values[offset];
+    }
+
+    _calculateOffset(x, y) {
+        return x + y * this.width;
     }
 }
