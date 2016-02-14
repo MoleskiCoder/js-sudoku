@@ -23,7 +23,7 @@ export default class SudokuGrid extends Grid {
         this._offsets = [];
 
         let numbers = new Set;
-        for (let i = 1; i < this.DIMENSION + 1; ++i) {
+        for (let i = 1; i < (this.DIMENSION + 1); ++i) {
             numbers.add(i);
         }
 
@@ -102,7 +102,7 @@ export default class SudokuGrid extends Grid {
             for (let x = 0; x < this.WIDTH; ++x) {
                 this._adjustPossibleCounters(counters, offset++);
             }
-            this._transferCountedEliminations(counters);
+           this._transferCountedEliminations(counters);
         }
     }
 
@@ -139,8 +139,7 @@ export default class SudokuGrid extends Grid {
     }
 
     _transferCountedEliminations(counters) {
-        let numbers = Object.keys(counters);
-        for (let number in numbers) {
+        for (let [number, cells] in counters) {
             let cells = counters[key];
             if (cells.length == 1) {
                 let cell = cells[0];
@@ -192,8 +191,7 @@ export default class SudokuGrid extends Grid {
     _clearRowPossibles(y, number) {
         let offset = y * this.DIMENSION;
         for (let x = 0; x < this.WIDTH; ++x) {
-            let possible = this._possibles[offset];
-            possible.delete(number);
+            this._possibles[offset].delete(number);
             offset++;
         }
     }
@@ -201,8 +199,7 @@ export default class SudokuGrid extends Grid {
     _clearColumnPossibles(x, number) {
         let offset = x;
         for (let y = 0; y < this.HEIGHT; ++y) {
-            let possible = this._possibles[offset];
-            possible.delete(number);
+            this._possibles[offset].delete(number);
             offset += this.DIMENSION;
         }
     }
@@ -212,8 +209,7 @@ export default class SudokuGrid extends Grid {
             let y = yOffset + boxStartY;
             let offset = boxStartX + y * this.DIMENSION;
             for (let xOffset = 0; xOffset < this.BOX_DIMENSION; ++xOffset) {
-                let possible = this._possibles[offset];
-                possible.delete(number);
+                this._possibles[offset].delete(number);
                 offset++;
             }
         }
