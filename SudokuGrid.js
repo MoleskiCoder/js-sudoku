@@ -83,7 +83,7 @@ export default class SudokuGrid extends Grid {
 
         for (let i = 0; i < this.CELL_COUNT; ++i) {
             let possible = this._possibles[i];
-            if (possible.length > 1) {
+            if (possible.size > 1) {
                 this._offsets.push(i);
             }
         }
@@ -176,12 +176,12 @@ export default class SudokuGrid extends Grid {
         let transfer = false;
         for (let offset = 0; offset < this.CELL_COUNT; ++offset) {
             let possible = this._possibles[offset];
-            let keys = Object.keys(possible);
-            if (keys.length === 1) {
+            if (possible.size === 1) {
+                let keys = [...possible ];
                 let first = keys[0];
                 let singular = possible[first];
                 this.set(offset, singular);
-                delete possible[first];
+                possible.clear();
                 transfer = true;
             }
         }
