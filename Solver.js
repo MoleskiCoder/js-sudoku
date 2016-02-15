@@ -42,7 +42,7 @@ export default class Solver {
         let numbers = this.grid.getPossibilities(offset);
 
         let x = offset % this.grid.DIMENSION;
-        let y = offset / this.grid.DIMENSION;
+        let y = Math.floor(offset / this.grid.DIMENSION);
         for (let number of numbers) {
             if (this._isAvailable(x, y, number)) { // if looks promising,
                 this.grid.set(offset, number); // make tentative assignment
