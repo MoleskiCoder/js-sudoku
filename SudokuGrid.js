@@ -65,6 +65,14 @@ export default class SudokuGrid extends Grid {
     }
 
     getOffset(index) {
+
+        if (index === undefined) {
+            throw "missing argument: index";
+        }
+        if (typeof index !== 'number' || (index % 1 !== 0)) {
+            throw "incorrect type: index must be an integer number";
+        }
+
         if (index + 1 > this._offsetCount) {
             return -1;
         }
@@ -139,6 +147,15 @@ export default class SudokuGrid extends Grid {
     }
 
     _transferCountedEliminations(counters) {
+
+        if (counters === undefined) {
+            throw "missing argument: counters";
+        }
+
+        if (Object.getPrototypeOf(counters) !== Map.prototype) {
+            throw "incorrect type: counters must be a Map";
+        }
+
         for (let [number, cells] of counters) {
             if (cells.length === 1) {
                 let cell = cells[0];
@@ -149,6 +166,22 @@ export default class SudokuGrid extends Grid {
     }
 
     _adjustPossibleCounters(counters, offset) {
+
+        if (counters === undefined) {
+            throw "missing argument: counters";
+        }
+
+        if (Object.getPrototypeOf(counters) !== Map.prototype) {
+            throw "incorrect type: counters must be a Map";
+        }
+
+        if (offset === undefined) {
+            throw "missing argument: offset";
+        }
+        if (typeof offset !== 'number' || (offset % 1 !== 0)) {
+            throw "incorrect type: offset must be an integer number";
+        }
+
         for (let possible of this._possibles[offset]) {
             let counter = counters.get(possible);
             if (counter === undefined) {
@@ -189,6 +222,21 @@ export default class SudokuGrid extends Grid {
     }
 
     _clearRowPossibles(y, number) {
+
+        if (y === undefined) {
+            throw "missing argument: y";
+        }
+        if (typeof y !== 'number' || (y % 1 !== 0)) {
+            throw "incorrect type: y must be an integer number";
+        }
+
+        if (number === undefined) {
+            throw "missing argument: number";
+        }
+        if (typeof number !== 'number' || (number % 1 !== 0)) {
+            throw "incorrect type: number must be an integer number";
+        }
+
         let offset = y * this.DIMENSION;
         for (let x = 0; x < this.WIDTH; ++x) {
             this._possibles[offset].delete(number);
@@ -197,6 +245,21 @@ export default class SudokuGrid extends Grid {
     }
 
     _clearColumnPossibles(x, number) {
+
+        if (x === undefined) {
+            throw "missing argument: x";
+        }
+        if (typeof x !== 'number' || (x % 1 !== 0)) {
+            throw "incorrect type: x must be an integer number";
+        }
+
+        if (number === undefined) {
+            throw "missing argument: number";
+        }
+        if (typeof number !== 'number' || (number % 1 !== 0)) {
+            throw "incorrect type: number must be an integer number";
+        }
+
         let offset = x;
         for (let y = 0; y < this.HEIGHT; ++y) {
             this._possibles[offset].delete(number);
@@ -205,6 +268,28 @@ export default class SudokuGrid extends Grid {
     }
 
     _clearBoxPossibilities(boxStartX, boxStartY, number) {
+
+        if (boxStartX === undefined) {
+            throw "missing argument: boxStartX";
+        }
+        if (typeof boxStartX !== 'number' || (boxStartX % 1 !== 0)) {
+            throw "incorrect type: boxStartX must be an integer number";
+        }
+
+        if (boxStartY === undefined) {
+            throw "missing argument: boxStartY";
+        }
+        if (typeof boxStartY !== 'number' || (boxStartY % 1 !== 0)) {
+            throw "incorrect type: boxStartY must be an integer number";
+        }
+
+        if (number === undefined) {
+            throw "missing argument: number";
+        }
+        if (typeof number !== 'number' || (number % 1 !== 0)) {
+            throw "incorrect type: number must be an integer number";
+        }
+
         for (let yOffset = 0; yOffset < this.BOX_DIMENSION; ++yOffset) {
             let y = yOffset + boxStartY;
             let offset = boxStartX + y * this.DIMENSION;

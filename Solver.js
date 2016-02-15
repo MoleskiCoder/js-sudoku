@@ -1,5 +1,7 @@
 ﻿"use strict";
 
+import SudokuGrid from './SudokuGrid';
+
 /**
  * From: https://see.stanford.edu/materials/icspacs106b/H19-RecBacktrackExamples.pdf
  *
@@ -7,6 +9,14 @@
 export default class Solver {
 
     constructor(start) {
+
+        if (start === undefined) {
+            throw "missing argument: start";
+        }
+        if (Object.getPrototypeOf(start) !== SudokuGrid.prototype) {
+            throw "incorrect type: start must be a SudokuGrid";
+        }
+
         this.grid = start;
         this.width = this.grid.width;
         this.height = this.grid.height;
@@ -97,6 +107,21 @@ export default class Solver {
      * in the specified row matches the given number.
      */
     _isUsedInRow(y, number) {
+
+        if (y === undefined) {
+            throw "missing argument: y";
+        }
+        if (typeof y !== 'number' || (y % 1 !== 0)) {
+            throw "incorrect type: y must be an integer number";
+        }
+
+        if (number === undefined) {
+            throw "missing argument: number";
+        }
+        if (typeof number !== 'number' || (number % 1 !== 0)) {
+            throw "incorrect type: number must be an integer number";
+        }
+
         let offset = y * this.grid.DIMENSION;
         for (let x = 0; x < this.width; ++x) {
             if (this.grid.get(offset++) === number) {
@@ -113,6 +138,21 @@ export default class Solver {
      * in the specified column matches the given number.
      */
     _isUsedInColumn(x, number) {
+
+        if (x === undefined) {
+            throw "missing argument: x";
+        }
+        if (typeof x !== 'number' || (x % 1 !== 0)) {
+            throw "incorrect type: x must be an integer number";
+        }
+
+        if (number === undefined) {
+            throw "missing argument: number";
+        }
+        if (typeof number !== 'number' || (number % 1 !== 0)) {
+            throw "incorrect type: number must be an integer number";
+        }
+
         let offset = x;
         for (let y = 0; y < this.height; ++y) {
             if (this.grid.get(offset) === number) {
@@ -130,6 +170,28 @@ export default class Solver {
      * within the specified 3x3 box matches the given number.
      */
     _isUsedInBox(boxStartX, boxStartY, number) {
+
+        if (boxStartX === undefined) {
+            throw "missing argument: boxStartX";
+        }
+        if (typeof boxStartX !== 'number' || (boxStartX % 1 !== 0)) {
+            throw "incorrect type: boxStartX must be an integer number";
+        }
+
+        if (boxStartY === undefined) {
+            throw "missing argument: boxStartY";
+        }
+        if (typeof boxStartY !== 'number' || (boxStartY % 1 !== 0)) {
+            throw "incorrect type: boxStartY must be an integer number";
+        }
+
+        if (number === undefined) {
+            throw "missing argument: number";
+        }
+        if (typeof number !== 'number' || (number % 1 !== 0)) {
+            throw "incorrect type: number must be an integer number";
+        }
+
         for (let yOffset = 0; yOffset < this.grid.BOX_DIMENSION; ++yOffset) {
             let y = yOffset + boxStartY;
             let offset = boxStartX + y * this.grid.DIMENSION;

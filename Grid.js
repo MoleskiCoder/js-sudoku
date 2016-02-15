@@ -19,7 +19,7 @@ export default class Grid {
         }
 
         if (initial === undefined) {
-            throw "missing argument: ";
+            throw "missing argument: initial";
         }
         if (typeof initial !== 'object' || !Array.isArray(initial)) {
             throw "incorrect type: initial must be an array";
@@ -64,6 +64,13 @@ export default class Grid {
         }
         if (typeof offset !== 'number' || (offset % 1 !== 0)) {
             throw "incorrect type: offset must be an integer number";
+        }
+
+        if (value === undefined) {
+            throw "missing argument: value";
+        }
+        if (typeof value !== 'number' || (value % 1 !== 0)) {
+            throw "incorrect type: value must be an integer number";
         }
 
         this._values[offset] = value;
