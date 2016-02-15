@@ -63,6 +63,28 @@ export default class Solver {
      * number is not already used in the row, column, or box.
      */
     _isAvailable(x, y, number) {
+
+        if (x === undefined) {
+            throw "missing argument: x";
+        }
+        if (typeof x !== 'number' || (x % 1 !== 0)) {
+            throw "incorrect type: x must be an integer number";
+        }
+
+        if (y === undefined) {
+            throw "missing argument: y";
+        }
+        if (typeof y !== 'number' || (y % 1 !== 0)) {
+            throw "incorrect type: y must be an integer number";
+        }
+
+        if (number === undefined) {
+            throw "missing argument: y";
+        }
+        if (typeof number !== 'number' || (number % 1 !== 0)) {
+            throw "incorrect type: number must be an integer number";
+        }
+
         return !this._isUsedInRow(y, number)
             && !this._isUsedInColumn(x, number)
             && !this._isUsedInBox(x - x % this.grid.BOX_DIMENSION, y - y % this.grid.BOX_DIMENSION, number);
