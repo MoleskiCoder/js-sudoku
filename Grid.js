@@ -22,7 +22,7 @@ export default class Grid {
             throw "missing argument: ";
         }
         if (typeof initial !== 'object' || !Array.isArray(initial)) {
-            throw "incorrect type: offset must be an array";
+            throw "incorrect type: initial must be an array";
         }
 
         this._height = gridHeight;
