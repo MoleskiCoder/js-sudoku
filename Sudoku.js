@@ -19,21 +19,18 @@ let data = [
 let puzzle = new SudokuGrid(data);
 let solver = new Solver(puzzle);
 
-console.log(puzzle.toString());
-
-//var start = DateTime.Now;
+let start = Date.now();
 let solved = solver.solve();
-//var finish = DateTime.Now;
+let finish = Date.now();
 
 if (solved) {
 
     console.log(puzzle.toString());
 
-    //var elapsedTime = finish - start;
-    //var elapsed = elapsedTime.Milliseconds;
-    //var seconds = elapsed / 1000.0 + (elapsed % 1000L) / 1000.0;
+    let elapsed = finish - start;
+    let seconds = elapsed / 1000.0 + (elapsed % 1000) / 1000.0;
 
-    //Console.Out.WriteLine(string.Format(CultureInfo.CurrentCulture, "\n\nTime taken {0} seconds\n", seconds));
+    console.log("Time taken " + seconds + " seconds");
 }
 else
 {
