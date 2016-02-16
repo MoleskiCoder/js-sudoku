@@ -120,12 +120,10 @@ export default class SudokuGrid extends Grid {
 
     _eliminateBoxDangling() {
         for (let y = 0; y < this.HEIGHT; y += this.BOX_DIMENSION) {
+            let boxStartY = y - y % this.BOX_DIMENSION;
             for (let x = 0; x < this.WIDTH; x += this.BOX_DIMENSION) {
-            let counters = new Map();
-
+                let counters = new Map();
                 let boxStartX = x - x % this.BOX_DIMENSION;
-                let boxStartY = y - y % this.BOX_DIMENSION;
-
                 for (let yOffset = 0; yOffset < this.BOX_DIMENSION; ++yOffset) {
                     let boxY = yOffset + boxStartY;
                     let offset = boxStartX + boxY * this.DIMENSION;
@@ -142,8 +140,9 @@ export default class SudokuGrid extends Grid {
         for (let [number, cells] of counters) {
             if (cells.length === 1) {
                 let cell = cells[0];
-                this._possibles[cell].clear();
-                this._possibles[cell].add(number);
+                let possibles = this._possibles[cell];
+                possibles.clear();
+                possibles.add(number);
             }
         }
     }
@@ -161,12 +160,14 @@ export default class SudokuGrid extends Grid {
 
     _eliminateAssigned() {
         for (let y = 0; y < this.HEIGHT; ++y) {
+            let boxY = y - y % this.BOX_DIMENSION;
             for (let x = 0; x < this.WIDTH; ++x) {
                 let number = this.get(x, y);
                 if (number !== this.UNASSIGNED) {
                     this._clearRowPossibles(y, number);
                     this._clearColumnPossibles(x, number);
-                    this._clearBoxPossibilities(x - x % this.BOX_DIMENSION, y - y % this.BOX_DIMENSION, number);
+                    let boxX = x - x % this.BOX_DIMENSION;
+                    this._clearBoxPossibilities(boxX, boxY, number);
                 }
             }
         }
@@ -191,8 +192,7 @@ export default class SudokuGrid extends Grid {
     _clearRowPossibles(y, number) {
         let offset = y * this.DIMENSION;
         for (let x = 0; x < this.WIDTH; ++x) {
-            this._possibles[offset].delete(number);
-            offset++;
+            this._possibles[offset++].delete(number);
         }
     }
 
@@ -209,8 +209,7 @@ export default class SudokuGrid extends Grid {
             let y = yOffset + boxStartY;
             let offset = boxStartX + y * this.DIMENSION;
             for (let xOffset = 0; xOffset < this.BOX_DIMENSION; ++xOffset) {
-                this._possibles[offset].delete(number);
-                offset++;
+                this._possibles[offset++].delete(number);
             }
         }
     }
