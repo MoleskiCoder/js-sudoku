@@ -1,4 +1,4 @@
-﻿"use strict";
+﻿'use strict';
 
 import SudokuGrid from './SudokuGrid';
 
@@ -8,121 +8,127 @@ import SudokuGrid from './SudokuGrid';
  */
 export default class Solver {
 
-    constructor(start) {
-        this.grid = start;
-        this.width = this.grid.width;
-        this.height = this.grid.height;
+  constructor(start) {
+    this._grid = start;
+    this._width = this._grid.width;
+    this._height = this._grid.height;
+
+    this._recursed = 0;
+    this._looped = 0;
+  }
+
+  solve() {
+    this._grid._eliminate();
+    return this._partialSolve(0);
+  }
+
+  /*
+   * Function: _partialSolve
+   * -----------------------
+   * Takes a partially filled-in grid and attempts to assign values to all
+   * unassigned locations in such a way to meet the requirements for sudoku
+   * solution (non-duplication across rows, columns, and boxes). The function
+   * operates via recursive backtracking: it finds an unassigned location with
+   * the grid and then considers all digits from 1 to 9 in a loop. If a digit
+   * is found that has no existing conflicts, tentatively assign it and recur
+   * to attempt to fill in rest of grid. If this was successful, the puzzle is
+   * solved. If not, unmake that decision and try again. If all digits have
+   * been examined and none worked out, return false to backtrack to previous
+   * decision point.
+   */
+  _partialSolve(index) {
+
+    ++this._recursed;
+
+    let offset = this._grid.getOffset(index);
+
+    if (offset === -1) {
+      return true; // Success!
     }
 
-    solve() {
-        this.grid._eliminate();
-        return this._partialSolve(0);
-    }
+    let numbers = this._grid.getPossibilities(offset);
 
-    /*
-     * Function: _partialSolve
-     * -----------------------
-     * Takes a partially filled-in grid and attempts to assign values to all
-     * unassigned locations in such a way to meet the requirements for sudoku
-     * solution (non-duplication across rows, columns, and boxes). The function
-     * operates via recursive backtracking: it finds an unassigned location with
-     * the grid and then considers all digits from 1 to 9 in a loop. If a digit
-     * is found that has no existing conflicts, tentatively assign it and recur
-     * to attempt to fill in rest of grid. If this was successful, the puzzle is
-     * solved. If not, unmake that decision and try again. If all digits have
-     * been examined and none worked out, return false to backtrack to previous
-     * decision point.
-     */
-    _partialSolve(index) {
+    let x = offset % this._grid.DIMENSION;
+    let y = Math.floor(offset / this._grid.DIMENSION);
+    for (let check of numbers) {
+      if (check === undefined) {
+        continue;
+      }
 
-        let offset = this.grid.getOffset(index);
-
-        if (offset === -1) {
-            return true; // success!
+      ++this._looped;
+      if (this._isAvailable(x, y, check)) { // If looks promising,
+        this._grid.set(offset, check); // Make tentative assignment
+        if (this._partialSolve(index + 1)) {
+          return true; // Recur, if success, yay!
         }
+      }
+    }
+    this._grid.set(offset, this._grid.UNASSIGNED); // Failure, unmake & try again
+    return false; // This triggers backtracking
+  }
 
-        let numbers = this.grid.getPossibilities(offset);
+  /*
+   * Function: _isAvailable
+   * ----------------------
+   * Returns a boolean which indicates whether it will be legal to assign
+   * number to the given row,column location. As assignment is legal if it that
+   * number is not already used in the row, column, or box.
+   */
+  _isAvailable(x, y, check) {
+    return !this._isUsedInRow(y, check) &&
+           !this._isUsedInColumn(x, check) &&
+           !this._isUsedInBox(x - x % this._grid.BOX_DIMENSION, y - y % this._grid.BOX_DIMENSION, check);
+  }
 
-        let x = offset % this.grid.DIMENSION;
-        let y = Math.floor(offset / this.grid.DIMENSION);
-        for (let check of numbers) {
-            if (check === undefined) {
-                continue;
-            }
+  /*
+  * Function: _isUsedInRow
+  * ----------------------
+  * Returns a boolean which indicates whether any assigned entry
+  * in the specified row matches the given number.
+  */
+  _isUsedInRow(y, check) {
+    let offset = y * this._grid.DIMENSION;
+    for (let x = 0; x < this._width; ++x) {
+      if (this._grid.get(offset++) === check) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-            if (this._isAvailable(x, y, check)) { // if looks promising,
-                this.grid.set(offset, check); // make tentative assignment
-                if (this._partialSolve(index + 1)) {
-                    return true; // recur, if success, yay!
-                }
-            }
+  /*
+  * Function: _isUsedInColumn
+  * -------------------------
+  * Returns a boolean which indicates whether any assigned entry
+  * in the specified column matches the given number.
+  */
+  _isUsedInColumn(x, check) {
+    let offset = x;
+    for (let y = 0; y < this._height; ++y) {
+      if (this._grid.get(offset) === check) {
+        return true;
+      }
+      offset += this._grid.DIMENSION;
+    }
+    return false;
+  }
+
+  /*
+  * Function: _isUsedInBox
+  * ----------------------
+  * Returns a boolean which indicates whether any assigned entry
+  * within the specified 3x3 box matches the given number.
+  */
+  _isUsedInBox(boxStartX, boxStartY, check) {
+    for (let yOffset = 0; yOffset < this._grid.BOX_DIMENSION; ++yOffset) {
+      let y = yOffset + boxStartY;
+      let offset = boxStartX + y * this._grid.DIMENSION;
+      for (let xOffset = 0; xOffset < this._grid.BOX_DIMENSION; ++xOffset) {
+        if (this._grid.get(offset++) === check) {
+          return true;
         }
-        this.grid.set(offset, this.grid.UNASSIGNED); // failure, unmake & try again
-        return false; // this triggers backtracking
+      }
     }
-
-    /*
-     * Function: _isAvailable
-     * ----------------------
-     * Returns a boolean which indicates whether it will be legal to assign
-     * number to the given row,column location. As assignment is legal if it that
-     * number is not already used in the row, column, or box.
-     */
-    _isAvailable(x, y, check) {
-        return !this._isUsedInRow(y, check) &&
-               !this._isUsedInColumn(x, check) &&
-               !this._isUsedInBox(x - x % this.grid.BOX_DIMENSION, y - y % this.grid.BOX_DIMENSION, check);
-    }
-
-    /*
-     * Function: _isUsedInRow
-     * ----------------------
-     * Returns a boolean which indicates whether any assigned entry
-     * in the specified row matches the given number.
-     */
-    _isUsedInRow(y, check) {
-        let offset = y * this.grid.DIMENSION;
-        for (let x = 0; x < this.width; ++x) {
-            if (this.grid.get(offset++) === check) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /*
-     * Function: _isUsedInColumn
-     * -------------------------
-     * Returns a boolean which indicates whether any assigned entry
-     * in the specified column matches the given number.
-     */
-    _isUsedInColumn(x, check) {
-        let offset = x;
-        for (let y = 0; y < this.height; ++y) {
-            if (this.grid.get(offset) === check) {
-                return true;
-            }
-            offset += this.grid.DIMENSION;
-        }
-        return false;
-    }
-
-    /*
-     * Function: _isUsedInBox
-     * ----------------------
-     * Returns a boolean which indicates whether any assigned entry
-     * within the specified 3x3 box matches the given number.
-     */
-    _isUsedInBox(boxStartX, boxStartY, check) {
-        for (let yOffset = 0; yOffset < this.grid.BOX_DIMENSION; ++yOffset) {
-            let y = yOffset + boxStartY;
-            let offset = boxStartX + y * this.grid.DIMENSION;
-            for (let xOffset = 0; xOffset < this.grid.BOX_DIMENSION; ++xOffset) {
-                if (this.grid.get(offset++) === check) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    return false;
+  }
 }

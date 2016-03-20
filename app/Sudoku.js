@@ -1,4 +1,4 @@
-﻿"use strict";
+﻿'use strict';
 
 import SudokuGrid from './SudokuGrid';
 import Solver from './Solver';
@@ -13,7 +13,7 @@ let data = [
     0, 0, 0, 1, 0, 0, 0, 3, 0,
     0, 0, 1, 0, 0, 0, 0, 6, 8,
     0, 0, 8, 5, 0, 0, 0, 1, 0,
-    0, 9, 0, 0, 0, 0, 4, 0, 0
+    0, 9, 0, 0, 0, 0, 4, 0, 0,
 ];
 
 let puzzle = new SudokuGrid(data);
@@ -25,14 +25,12 @@ let finish = Date.now();
 
 if (solved) {
 
-    console.log(puzzle.toString());
+  console.log(puzzle.toString());
 
-    let elapsed = finish - start;
-    let seconds = elapsed / 1000.0 + (elapsed % 1000) / 1000.0;
+  let elapsed = finish - start;
+  let seconds = elapsed / 1000.0 + (elapsed % 1000) / 1000.0;
 
-    console.log("Time taken " + seconds + " seconds");
-}
-else
-{
-    console.log("No solution exists");
+  console.log('Time taken ' + seconds + ' seconds');
+} else {
+  console.log('No solution exists');
 }
