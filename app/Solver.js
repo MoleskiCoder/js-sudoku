@@ -45,9 +45,13 @@ export default class Solver {
 
         let x = offset % this.grid.DIMENSION;
         let y = Math.floor(offset / this.grid.DIMENSION);
-        for (let number of numbers) {
-            if (this._isAvailable(x, y, number)) { // if looks promising,
-                this.grid.set(offset, number); // make tentative assignment
+        for (let check of numbers) {
+            if (check === undefined) {
+                continue;
+            }
+
+            if (this._isAvailable(x, y, check)) { // if looks promising,
+                this.grid.set(offset, check); // make tentative assignment
                 if (this._partialSolve(index + 1)) {
                     return true; // recur, if success, yay!
                 }
@@ -64,10 +68,10 @@ export default class Solver {
      * number to the given row,column location. As assignment is legal if it that
      * number is not already used in the row, column, or box.
      */
-    _isAvailable(x, y, number) {
-        return !this._isUsedInRow(y, number)
-            && !this._isUsedInColumn(x, number)
-            && !this._isUsedInBox(x - x % this.grid.BOX_DIMENSION, y - y % this.grid.BOX_DIMENSION, number);
+    _isAvailable(x, y, check) {
+        return !this._isUsedInRow(y, check) &&
+               !this._isUsedInColumn(x, check) &&
+               !this._isUsedInBox(x - x % this.grid.BOX_DIMENSION, y - y % this.grid.BOX_DIMENSION, check);
     }
 
     /*
@@ -76,10 +80,10 @@ export default class Solver {
      * Returns a boolean which indicates whether any assigned entry
      * in the specified row matches the given number.
      */
-    _isUsedInRow(y, number) {
+    _isUsedInRow(y, check) {
         let offset = y * this.grid.DIMENSION;
         for (let x = 0; x < this.width; ++x) {
-            if (this.grid.get(offset++) === number) {
+            if (this.grid.get(offset++) === check) {
                 return true;
             }
         }
@@ -92,10 +96,10 @@ export default class Solver {
      * Returns a boolean which indicates whether any assigned entry
      * in the specified column matches the given number.
      */
-    _isUsedInColumn(x, number) {
+    _isUsedInColumn(x, check) {
         let offset = x;
         for (let y = 0; y < this.height; ++y) {
-            if (this.grid.get(offset) === number) {
+            if (this.grid.get(offset) === check) {
                 return true;
             }
             offset += this.grid.DIMENSION;
@@ -109,12 +113,12 @@ export default class Solver {
      * Returns a boolean which indicates whether any assigned entry
      * within the specified 3x3 box matches the given number.
      */
-    _isUsedInBox(boxStartX, boxStartY, number) {
+    _isUsedInBox(boxStartX, boxStartY, check) {
         for (let yOffset = 0; yOffset < this.grid.BOX_DIMENSION; ++yOffset) {
             let y = yOffset + boxStartY;
             let offset = boxStartX + y * this.grid.DIMENSION;
             for (let xOffset = 0; xOffset < this.grid.BOX_DIMENSION; ++xOffset) {
-                if (this.grid.get(offset++) === number) {
+                if (this.grid.get(offset++) === check) {
                     return true;
                 }
             }

@@ -29,9 +29,7 @@ export default class SudokuGrid extends Grid {
 
         for (let offset = 0; offset < this.CELL_COUNT; ++offset) {
             if (this.get(offset) === this.UNASSIGNED) {
-                this._possibles.push(new Set(numbers));
-            } else {
-                this._possibles.push(new Set());
+                this._possibles[offset] = new Set(numbers);
             }
         }
     }
@@ -81,12 +79,11 @@ export default class SudokuGrid extends Grid {
             this._eliminateDangling();
         } while (this._transferSingularPossibilities());
 
-        for (let i = 0; i < this.CELL_COUNT; ++i) {
-            let possible = this._possibles[i];
+        this._possibles.forEach((possible, i) => {
             if (possible.size > 1) {
                 this._offsets.push(i);
             }
-        }
+        });
     }
 
     _eliminateDangling() {
@@ -137,24 +134,25 @@ export default class SudokuGrid extends Grid {
     }
 
     _transferCountedEliminations(counters) {
-        for (let [number, cells] of counters) {
-            if (cells.length === 1) {
-                let cell = cells[0];
-                let possibles = this._possibles[cell];
-                possibles.clear();
-                possibles.add(number);
+        counters.forEach((counter, i) => {
+            if (counter.length === 1) {
+                let cell = counter[0];
+                this._possibles[cell] = [i];
             }
-        }
+        });
     }
 
     _adjustPossibleCounters(counters, offset) {
-        for (let possible of this._possibles[offset]) {
-            let counter = counters.get(possible);
-            if (counter === undefined) {
-                counter = [];
-                counters.set(possible, counter);
-            }
-            counter.push(offset);
+        let possibles = this._possibles[offset];
+        if (possibles !== undefined) {
+            possibles.forEach((possible) => {
+                let counter = counters[possible];
+                if (counter === undefined) {
+                    counter = [];
+                    counters[possible] = counter;
+                }
+                counter.push(offset);
+            });
         }
     }
 
@@ -175,41 +173,49 @@ export default class SudokuGrid extends Grid {
 
     _transferSingularPossibilities() {
         let transfer = false;
-        for (let offset = 0; offset < this.CELL_COUNT; ++offset) {
-            let possible = this._possibles[offset];
-            if (possible.size === 1) {
-                let keys = [...possible ];
-                let first = keys[0];
-                let singular = possible[first];
+        let possibles = this._possibles;
+        possibles.forEach((possible, offset) => {
+            let count = possibles.size;
+            if (count === 1) {
+                let singular = [...possible][0]
                 this.set(offset, singular);
-                possible.clear();
+                delete possibles[offset];
                 transfer = true;
             }
-        }
+        });
         return transfer;
     }
 
-    _clearRowPossibles(y, number) {
+    _clearRowPossibles(y, current) {
         let offset = y * this.DIMENSION;
         for (let x = 0; x < this.WIDTH; ++x) {
-            this._possibles[offset++].delete(number);
+            let possibles = this._possibles[offset++];
+            if (possibles !== undefined) {
+                delete possibles[current];
+            }
         }
     }
 
-    _clearColumnPossibles(x, number) {
+    _clearColumnPossibles(x, current) {
         let offset = x;
         for (let y = 0; y < this.HEIGHT; ++y) {
-            this._possibles[offset].delete(number);
+            let possibles = this._possibles[offset];
+            if (possibles !== undefined) {
+                delete possibles[current];
+            }
             offset += this.DIMENSION;
         }
     }
 
-    _clearBoxPossibilities(boxStartX, boxStartY, number) {
+    _clearBoxPossibilities(boxStartX, boxStartY, current) {
         for (let yOffset = 0; yOffset < this.BOX_DIMENSION; ++yOffset) {
             let y = yOffset + boxStartY;
             let offset = boxStartX + y * this.DIMENSION;
             for (let xOffset = 0; xOffset < this.BOX_DIMENSION; ++xOffset) {
-                this._possibles[offset++].delete(number);
+                let possibles = this._possibles[offset++];
+                if (possibles !== undefined) {
+                    delete possibles[current];
+                }
             }
         }
     }
